@@ -10,7 +10,7 @@ on:
     - test
 
 jobs:
-  newman:
+  test-api:
     runs-on: ubuntu-latest
     steps:
      
@@ -23,7 +23,7 @@ jobs:
         with:
           collection: postman_collection.json
           environment: postman_environment_prd.json
-          report: '["emojitrain"]'
+          reporter: '["emojitrain"]'
       
       - name: Output summary to console
         run: echo ${{ steps.run-newman.outputs.summary }}
