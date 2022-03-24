@@ -1,0 +1,32 @@
+name: Testes Integrados
+
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
+
+jobs:
+  newman:
+    runs-on: ubuntu-latest
+    steps:
+     
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Testes com Newman 
+        uses: matt-ball/newman-action@master
+        with:
+            with:
+              collection: postman_collection.json
+              environment: postman_environment_prd.json
+              report: '["emojitrain"]'
+      
+      - name: Upload Relatorio
+        uses: actions/upload-artifact@v3
+        with:
+          name: report.html
+          path: report.html
+          retention-days: 1
