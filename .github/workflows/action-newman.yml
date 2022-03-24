@@ -7,6 +7,7 @@ on:
   push:
     branches:
     - master
+    - test
 
 jobs:
   newman:
@@ -16,14 +17,17 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: Testes com Newman 
+      - name: Testes com Newman
+        id: run-newman
         uses: matt-ball/newman-action@master
         with:
-            with:
-              collection: postman_collection.json
-              environment: postman_environment_prd.json
-              report: '["emojitrain"]'
+          collection: postman_collection.json
+          environment: postman_environment_prd.json
+          report: '["emojitrain"]'
       
+      - name: Output summary to console
+        run: echo ${{ steps.run-newman.outputs.summary }}
+
       - name: Upload Relatorio
         uses: actions/upload-artifact@v3
         with:
