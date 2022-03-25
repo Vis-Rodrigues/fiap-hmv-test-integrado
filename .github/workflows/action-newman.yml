@@ -12,7 +12,7 @@ on:
 jobs:
 
   test-api:
-
+  
     uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@main
     inputs:
       collection: postman_collection
