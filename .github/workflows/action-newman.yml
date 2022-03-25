@@ -23,4 +23,4 @@ jobs:
     uses: Vis-Rodrigues/workflow-template/.github/workflows/deploy-github-page.yml@main
     needs: [newman-test]
     with:
-      artifact_path: report
+      artifact_download: report
