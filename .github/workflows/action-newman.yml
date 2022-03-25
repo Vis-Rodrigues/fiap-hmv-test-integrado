@@ -14,11 +14,13 @@ jobs:
 
   newman-test:
     uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@main
+    id: newman-test
     with:
       collection: postman_collection
       environment: postman_environment_prd
 
   deploy-github-page:
     uses: Vis-Rodrigues/workflow-template/.github/workflows/deploy-github-page.yml@main
+    needs: [newman-test]
     with:
       publish_dir: '.'
