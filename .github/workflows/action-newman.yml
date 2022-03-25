@@ -13,14 +13,14 @@ on:
 jobs:
 
   newman-test:
-    uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@main
+    uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@v2
     with:
       collection: postman_collection
       environment: postman_environment_prd
       artifact_name: report
 
   deploy-github-page:
-    uses: Vis-Rodrigues/workflow-template/.github/workflows/deploy-github-page.yml@main
+    uses: Vis-Rodrigues/workflow-template/.github/workflows/deploy-github-page.yml@v2
     needs: [newman-test]
     with:
       artifact_download: report
