@@ -17,9 +17,10 @@ jobs:
     with:
       collection: postman_collection
       environment: postman_environment_prd
+      artifact_name: report
 
   deploy-github-page:
     uses: Vis-Rodrigues/workflow-template/.github/workflows/deploy-github-page.yml@main
     needs: [newman-test]
     with:
-      publish_dir: '.'
+      artifact_path: report
