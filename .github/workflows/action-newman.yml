@@ -14,6 +14,6 @@ jobs:
   newman-test:
   
     uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@main
-      inputs:
-        collection: postman_collection
-        environment: postman_environment_prd
+    inputs:
+      collection: postman_collection
+      environment: postman_environment_prd
