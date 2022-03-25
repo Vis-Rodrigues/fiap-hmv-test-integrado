@@ -1,4 +1,4 @@
-name: Testes Integrados
+name: Testes Integrados de API com Newman
 
 on:
   pull_request:
@@ -10,27 +10,10 @@ on:
     - test
 
 jobs:
+
   test-api:
-    runs-on: ubuntu-latest
-    steps:
-     
-      - name: Checkout Repo
-        uses: actions/checkout@v2
 
-      - name: Testes com Newman
-        id: run-newman
-        uses: matt-ball/newman-action@master
-        with:
-          collection: postman_collection.json
-          environment: postman_environment_prd.json
-          reporter: '["emojitrain"]'
-      
-      - name: Output summary to console
-        run: echo ${{ steps.run-newman.outputs.summary }}
-
-      - name: Upload Relatorio
-        uses: actions/upload-artifact@v3
-        with:
-          name: report.html
-          path: report.html
-          retention-days: 1
+    uses: Vis-Rodrigues/workflow-template/.github/workflows/test-api-newman.yml@main
+    inputs:
+      collection: postman_collection
+      environment: postman_environment_prd
