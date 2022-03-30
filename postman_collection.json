@@ -9,7 +9,7 @@
 			"name": "Login",
 			"item": [
 				{
-					"name": "Verificar login com sucesso",
+					"name": "Verificar login com sucesso com perfil atendente",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -24,7 +24,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"_.validarBodyPreenchido(pm);"
+									"_.validarBodyPreenchido(pm);",
+									"pm.collectionVariables.set(\"token_atendente\", pm.response.text());"
 								],
 								"type": "text/javascript"
 							}
@@ -38,7 +39,59 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"{{email_valido}}\",\r\n    \"password\":\"{{senha}}\",\r\n    \"device_name\":\"fiap_hmv_mobile\"\r\n}",
+							"raw": "{\r\n    \"email\":\"{{email_atendente}}\",\r\n    \"password\":\"{{senha}}\",\r\n    \"device_name\":\"urnau_mobile\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/fiap-hmv/v1/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fiap-hmv",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verificar login com sucesso com perfil médico",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"status_code_esperado\", 200);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"_.validarBodyPreenchido(pm);",
+									"pm.collectionVariables.set(\"token_medico\", pm.response.text());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{email_medico}}\",\r\n    \"password\":\"{{senha}}\",\r\n    \"device_name\":\"urnau_mobile\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -66,7 +119,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+									"pm.collectionVariables.set(\"status_code_esperado\", 401);"
 								],
 								"type": "text/javascript"
 							}
@@ -75,7 +128,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"_.validarBodyPreenchido(pm);"
+									"_.validateDefaultResponseBody(pm, \"Não autorizado.\", false, []);"
 								],
 								"type": "text/javascript"
 							}
@@ -111,13 +164,13 @@
 					"response": []
 				},
 				{
-					"name": "Verificar login sem e-mail",
+					"name": "Verificar login com senha inválida",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+									"pm.collectionVariables.set(\"status_code_esperado\", 401);"
 								],
 								"type": "text/javascript"
 							}
@@ -126,7 +179,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"_.validarBodyPreenchido(pm);"
+									"_.validateDefaultResponseBody(pm, \"Não autorizado.\", false, []);"
 								],
 								"type": "text/javascript"
 							}
@@ -140,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"password\":\"{{senha}}\",\r\n    \"device_name\":\"fiap_hmv_mobile\"\r\n}",
+							"raw": "{\r\n    \"email\":\"{{email_medico}}\",\r\n    \"password\":\"{{$guid}}\",\r\n    \"device_name\":\"fiap_hmv_mobile\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -170,7 +223,7 @@
 					"name": "Consulta Usuario",
 					"item": [
 						{
-							"name": "Consulta usuário com sucesso",
+							"name": "Consulta usuário com perfil paciente com sucesso",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -198,7 +251,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{token}}",
+											"value": "{{token_medico}}",
 											"type": "string"
 										}
 									]
@@ -226,7 +279,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
 										],
 										"type": "text/javascript"
 									}
@@ -275,7 +328,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
 										],
 										"type": "text/javascript"
 									}
@@ -331,24 +384,144 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "Cadastro Usuario",
+					"item": [
+						{
+							"name": "Registrar usuario com sucesso",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 201);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validateBody(pm, '[]');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"password\",\r\n    \"doc_tipo\":\"cpf\",\r\n    \"doc_numero\":\"012.000.199-00\",\r\n    \"foto\":\"https://i.pinimg.com/474x/76/b2/79/76b2799fcd3c8b77e6e0e83a98af8657.jpg\",\r\n    \"nome\":\"{{$randomFullName}}\",\r\n    \"endereco\": {\r\n        \"nome\":\"Casa\",\r\n        \"tipo\": \"Rua\",\r\n        \"logradouro\": \"{{$randomStreetName}}\",\r\n        \"cep\": \"20102-314\",\r\n        \"numero\": \"1020\",\r\n        \"cidade\": \"São Paulo\",\r\n        \"estado\": \"SP\",\r\n        \"complemento\": \"esquina taubaté\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/usuarios",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"usuarios"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Registrar usuario duplicado",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 400);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let detalhes = {",
+											"        \"th\": {",
+											"            \"errorInfo\": [",
+											"                \"23505\",",
+											"                7,",
+											"                \"ERROR:  duplicate key value violates unique constraint \\\"usuarios_email_unique\\\"\\nDETAIL:  Key (email)=(willian71@example.net) already exists.\"",
+											"            ]",
+											"        }",
+											"    };",
+											"_.validateDefaultResponseBody(pm, \"Erro ao salvar usuário\", false, detalhes );",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"willian71@example.net\",\r\n    \"password\":\"password\",\r\n    \"doc_tipo\":\"cpf\",\r\n    \"doc_numero\":\"012.000.199-00\",\r\n    \"foto\":\"https://i.pinimg.com/474x/76/b2/79/76b2799fcd3c8b77e6e0e83a98af8657.jpg\",\r\n    \"nome\":\"{{$randomFullName}}\",\r\n    \"endereco\": {\r\n        \"nome\":\"Casa\",\r\n        \"tipo\": \"Rua\",\r\n        \"logradouro\": \"{{$randomStreetName}}\",\r\n        \"cep\": \"20102-314\",\r\n        \"numero\": \"1020\",\r\n        \"cidade\": \"São Paulo\",\r\n        \"estado\": \"SP\",\r\n        \"complemento\": \"esquina taubaté\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/usuarios",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"usuarios"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
 		{
-			"name": "Endereço",
+			"name": "Medico",
 			"item": [
 				{
-					"name": "Consulta",
+					"name": "Metricas Medico",
 					"item": [
 						{
-							"name": "Verificar consulta endereços com sucesso",
+							"name": "Verificar métricas de médico com sucesso",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
 											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
-											"_.realizarLogin(pm);"
+											"_.logarComCredenciais(pm, \"medico\");"
 										],
 										"type": "text/javascript"
 									}
@@ -369,7 +542,618 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{token}}",
+											"value": "{{token_medico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/medicos/{{medico_perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"metricas",
+										"medicos",
+										"{{medico_perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar métricas do usuário com token inválido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{$guid}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/medicos/{{medico_perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"metricas",
+										"medicos",
+										"{{medico_perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar métricas do usuário sem token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/medicos/{{medico_perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"metricas",
+										"medicos",
+										"{{medico_perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Questionário Emergencia",
+					"item": [
+						{
+							"name": "Verificar consulta questionário de emergencia com sucesso",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"medico\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_medico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/questionarios-emergencia/medico/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"questionarios-emergencia",
+										"medico",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar consulta questionário de emergencia com token inválido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{$guid}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/questionarios-emergencia/medico/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"questionarios-emergencia",
+										"medico",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Habitos Saúde",
+					"item": [
+						{
+							"name": "Verificar consulta hábito de saúde com sucesso",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"medico\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_medico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/habitos-saude/medicos/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"habitos-saude",
+										"medicos",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar consulta hábito de saúde com token inválido",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{$guid}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/habitos-saude/medicos/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"habitos-saude",
+										"medicos",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Relatório de Atendimento",
+					"item": [
+						{
+							"name": "Verificar cadastro de relatório de atendimento com sucesso",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 201);",
+											"_.logarComCredenciais(pm, \"medico\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validateBody(pm, '[]');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_medico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"relatorio\": \"Foi feito exame de urina para averiguar se o paciente pode estar com pedra no rim.\",\r\n    \"agendamento_id\": 68\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/atendimentos/medicos/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"atendimentos",
+										"medicos",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar cadastro de relatório de atendimento com token inválido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{$guid}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"relatorio\": \"Foi feito exame de urina para averiguar se o paciente pode estar com pedra no rim.\",\r\n    \"agendamento_id\": 68\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/atendimentos/medicos/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"atendimentos",
+										"medicos",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Ver Histórico de Atendimentos do Paciente",
+					"item": [
+						{
+							"name": "Verificar histórico de atendimentos do paciente com sucesso",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"medico\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_medico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/atendimentos/historicos/pacientes/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"atendimentos",
+										"historicos",
+										"pacientes",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar histórico de atendimentos do paciente com token inválido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{$guid}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/atendimentos/historicos/pacientes/{{perfil_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"atendimentos",
+										"historicos",
+										"pacientes",
+										"{{perfil_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Endereço",
+			"item": [
+				{
+					"name": "Consulta",
+					"item": [
+						{
+							"name": "Verificar consulta endereços com sucesso",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"medico\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_medico}}",
 											"type": "string"
 										}
 									]
@@ -397,7 +1181,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);",
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);",
 											""
 										],
 										"type": "text/javascript"
@@ -447,7 +1231,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);",
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);",
 											""
 										],
 										"type": "text/javascript"
@@ -522,7 +1306,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{token}}",
+											"value": "{{token_paciente}}",
 											"type": "string"
 										}
 									]
@@ -530,16 +1314,16 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/paciente/metricas/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/pacientes/{{paciente_id}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"fiap-hmv",
 										"v1",
-										"paciente",
 										"metricas",
-										"{{perfil_id}}"
+										"pacientes",
+										"{{paciente_id}}"
 									]
 								}
 							},
@@ -552,7 +1336,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
 										],
 										"type": "text/javascript"
 									}
@@ -581,16 +1365,16 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/paciente/metricas/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/pacientes/{{paciente_id}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"fiap-hmv",
 										"v1",
-										"paciente",
 										"metricas",
-										"{{perfil_id}}"
+										"pacientes",
+										"{{paciente_id}}"
 									]
 								}
 							},
@@ -603,7 +1387,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
 										],
 										"type": "text/javascript"
 									}
@@ -625,267 +1409,16 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/paciente/metricas/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/pacientes/{{paciente_id}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"fiap-hmv",
 										"v1",
-										"paciente",
 										"metricas",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Chamado Emergência",
-					"item": [
-						{
-							"name": "Verificar criação de chamado de emergência com sucesso",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"_.validarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Connection",
-										"value": "keep-alive"
-									},
-									{
-										"key": "sec-ch-ua",
-										"value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Opera\";v=\"84\""
-									},
-									{
-										"key": "Accept",
-										"value": "application/json, text/plain, */*"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer 123|VVH8iQ4qFCuUO7qSAKXqELnq9xGsfGJxNsdcFlFz"
-									},
-									{
-										"key": "sec-ch-ua-mobile",
-										"value": "?0"
-									},
-									{
-										"key": "User-Agent",
-										"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36 OPR/84.0.4316.42"
-									},
-									{
-										"key": "sec-ch-ua-platform",
-										"value": "\"Windows\""
-									},
-									{
-										"key": "Origin",
-										"value": "http://localhost:3000"
-									},
-									{
-										"key": "Sec-Fetch-Site",
-										"value": "same-site"
-									},
-									{
-										"key": "Sec-Fetch-Mode",
-										"value": "cors"
-									},
-									{
-										"key": "Sec-Fetch-Dest",
-										"value": "empty"
-									},
-									{
-										"key": "Referer",
-										"value": "http://localhost:3000/"
-									},
-									{
-										"key": "Accept-Language",
-										"value": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"id\": 51,\n    \"nome\": \"Corona Ltda.\",\n    \"tipo\": \"rua\",\n    \"logradouro\": \"Rua Camilo\",\n    \"cep\": \"66085-767\",\n    \"numero\": \"21872\",\n    \"cidade\": \"Eduardo do Norte\",\n    \"estado\": \"MA\",\n    \"pais\": \"Brasil\",\n    \"created_at\": \"2022-02-21T02:08:32.000000Z\",\n    \"updated_at\": \"2022-02-21T02:08:32.000000Z\",\n    \"name\": \"Corona Ltda. Rua Camilo, 21872\",\n    \"code\": 51\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/api/paciente/chamado-emergencia/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"paciente",
-										"chamado-emergencia",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar criação de chamado de emergência com token inválido",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.validarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{$guid}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/paciente/chamado-emergencia/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"paciente",
-										"chamado-emergencia",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar criação de chamado de emergência sem token",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Connection",
-										"value": "keep-alive"
-									},
-									{
-										"key": "sec-ch-ua",
-										"value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Opera\";v=\"84\""
-									},
-									{
-										"key": "Accept",
-										"value": "application/json, text/plain, */*"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer 123|VVH8iQ4qFCuUO7qSAKXqELnq9xGsfGJxNsdcFlFz"
-									},
-									{
-										"key": "sec-ch-ua-mobile",
-										"value": "?0"
-									},
-									{
-										"key": "User-Agent",
-										"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36 OPR/84.0.4316.42"
-									},
-									{
-										"key": "sec-ch-ua-platform",
-										"value": "\"Windows\""
-									},
-									{
-										"key": "Origin",
-										"value": "http://localhost:3000"
-									},
-									{
-										"key": "Sec-Fetch-Site",
-										"value": "same-site"
-									},
-									{
-										"key": "Sec-Fetch-Mode",
-										"value": "cors"
-									},
-									{
-										"key": "Sec-Fetch-Dest",
-										"value": "empty"
-									},
-									{
-										"key": "Referer",
-										"value": "http://localhost:3000/"
-									},
-									{
-										"key": "Accept-Language",
-										"value": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"id\": 51,\n    \"nome\": \"Corona Ltda.\",\n    \"tipo\": \"rua\",\n    \"logradouro\": \"Rua Camilo\",\n    \"cep\": \"66085-767\",\n    \"numero\": \"21872\",\n    \"cidade\": \"Eduardo do Norte\",\n    \"estado\": \"MA\",\n    \"pais\": \"Brasil\",\n    \"created_at\": \"2022-02-21T02:08:32.000000Z\",\n    \"updated_at\": \"2022-02-21T02:08:32.000000Z\",\n    \"name\": \"Corona Ltda. Rua Camilo, 21872\",\n    \"code\": 51\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/api/paciente/chamado-emergencia/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"paciente",
-										"chamado-emergencia",
-										"{{perfil_id}}"
+										"pacientes",
+										"{{paciente_id}}"
 									]
 								}
 							},
@@ -896,19 +1429,20 @@
 			]
 		},
 		{
-			"name": "Questionários de Emergência",
+			"name": "Atendente",
 			"item": [
 				{
-					"name": "Consulta",
+					"name": "Métricas Atendente",
 					"item": [
 						{
-							"name": "Verificar consulta questionário de emergência com sucesso",
+							"name": "Verificar métricas de atendente com sucesso",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"atendente\");"
 										],
 										"type": "text/javascript"
 									}
@@ -929,7 +1463,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{token}}",
+											"value": "{{token_atendente}}",
 											"type": "string"
 										}
 									]
@@ -937,28 +1471,28 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/atendentes",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
+										"fiap-hmv",
+										"v1",
+										"metricas",
+										"atendentes"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Verificar consulta questionário de emergência com token inválido",
+							"name": "Verificar métricas de atendente com token inválido",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
 										],
 										"type": "text/javascript"
 									}
@@ -987,58 +1521,15 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/metricas/atendentes",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar consulta questionário de emergência sem token",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.validarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
+										"fiap-hmv",
+										"v1",
+										"metricas",
+										"atendentes"
 									]
 								}
 							},
@@ -1047,136 +1538,17 @@
 					]
 				},
 				{
-					"name": "Novo questionário",
+					"name": "Buscar paciente por documento",
 					"item": [
 						{
-							"name": "Verificar resposta do questionário com sucesso",
+							"name": "Buscar paciente pelo CNPJ com sucesso",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
 											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
-											"_.realizarLogin(pm);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"1\":\"sim\",\r\n    \"2\":\"não\",\r\n    \"3\":\"sim\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar resposta do questionário com token inválido",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);",
-											""
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"1\":\"sim\",\r\n    \"2\":\"não\",\r\n    \"3\":\"sim\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar resposta do questionário sem token",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"_.logarComCredenciais(pm, \"atendente\");"
 										],
 										"type": "text/javascript"
 									}
@@ -1193,225 +1565,11 @@
 							],
 							"request": {
 								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"1\":\"sim\",\r\n    \"2\":\"não\",\r\n    \"3\":\"sim\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/questionario_emergencia/novo/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"questionario_emergencia",
-										"novo",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "Hábitos de Saúde",
-			"item": [
-				{
-					"name": "Consulta por cliente",
-					"item": [
-						{
-							"name": "Verificar consulta de hábito de saúde com sucesso",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
-											"_.realizarLogin(pm);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"fiap-hmv",
-										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar consulta de hábito de saúde com token inválido",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);",
-											"_.realizarLogin(pm);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{$guid}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"fiap-hmv",
-										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar consulta de hábito de saúde sem token",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);",
-											""
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"fiap-hmv",
-										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Cadastro Hábito de Saude",
-					"item": [
-						{
-							"name": "Verificar cadastro hábito de saúde com sucesso",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
-											"_.realizarLogin(pm);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{token}}",
+											"value": "{{token_atendente}}",
 											"type": "string"
 										}
 									]
@@ -1420,7 +1578,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"1\": \"sim\",\r\n    \"2\": \"não\",\r\n    \"4\": \"sim\",\r\n    \"5\": \"sim\",\r\n    \"6\": \"não\",\r\n    \"7\": \"não\",\r\n    \"8\": \"sim\",\r\n    \"9\": \"sim\",\r\n    \"10\": \"não\"\r\n}",
+									"raw": "{\r\n    \"doc_tipo\" : \"cnpj\",\r\n    \"doc_numero\": \"48.191.521/0001-08\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1428,28 +1586,29 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/pacientes/busca",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"fiap-hmv",
 										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
+										"pacientes",
+										"busca"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Verificar cadastro hábito de saúde com token inválido",
+							"name": "Buscar paciente pelo CPF com sucesso",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
+											"pm.collectionVariables.set(\"status_code_esperado\", 200);",
+											"_.logarComCredenciais(pm, \"atendente\");"
 										],
 										"type": "text/javascript"
 									}
@@ -1458,7 +1617,126 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"_.verificarBodyPreenchido(pm);"
+											"_.validarBodyPreenchido(pm);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_atendente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"doc_tipo\" : \"cpf\",\r\n    \"doc_numero\": \"251.001.868-01\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/pacientes/busca",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"pacientes",
+										"busca"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar paciente pelo CPF inexistente",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 404);",
+											"_.logarComCredenciais(pm, \"atendente\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validateBody(pm, '[]');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_atendente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"doc_tipo\" : \"cpf\",\r\n    \"doc_numero\": \"99560246003\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/fiap-hmv/v1/pacientes/busca",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"fiap-hmv",
+										"v1",
+										"pacientes",
+										"busca"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar paciente com token inválido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"status_code_esperado\", 500);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"_.validarBodyPreenchido(pm);"
 										],
 										"type": "text/javascript"
 									}
@@ -1479,7 +1757,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"1\": \"sim\",\r\n    \"2\": \"não\",\r\n    \"4\": \"sim\",\r\n    \"5\": \"sim\",\r\n    \"6\": \"não\",\r\n    \"7\": \"não\",\r\n    \"8\": \"sim\",\r\n    \"9\": \"sim\",\r\n    \"10\": \"não\"\r\n}",
+									"raw": "{\r\n    \"doc_tipo\" : \"cnpj\",\r\n    \"doc_numero\": \"41.159.141/0001-39\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1487,67 +1765,15 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
+									"raw": "{{base_url}}/fiap-hmv/v1/pacientes/busca",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"fiap-hmv",
 										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar cadastro hábito de saúde sem token",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"status_code_esperado\", 401);"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"_.verificarBodyPreenchido(pm);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"1\": \"sim\",\r\n    \"2\": \"não\",\r\n    \"4\": \"sim\",\r\n    \"5\": \"sim\",\r\n    \"6\": \"não\",\r\n    \"7\": \"não\",\r\n    \"8\": \"sim\",\r\n    \"9\": \"sim\",\r\n    \"10\": \"não\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/fiap-hmv/v1/habito-saude/{{perfil_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"fiap-hmv",
-										"v1",
-										"habito-saude",
-										"{{perfil_id}}"
+										"pacientes",
+										"busca"
 									]
 								}
 							},
@@ -1564,20 +1790,24 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"Object.prototype.realizarLoginComCredenciais = function (pm, username, password) {",
-					"    _sendRequestToken(pm, username, password);",
-					"}",
-					"",
 					"Object.prototype.realizarLogin = function (pm) {",
 					"    _sendRequestToken(pm, ",
-					"    pm.environment.get(\"email_valido\"), ",
-					"    pm.environment.get(\"senha\"));",
+					"        pm.environment.get(\"email_paciente\"), ",
+					"        pm.environment.get(\"senha\"),",
+					"        \"paciente\");",
+					"}",
+					"",
+					"Object.prototype.logarComCredenciais = function (pm, perfil ) {",
+					"    email = \"email_\" + perfil;",
+					"    _sendRequestToken(pm, ",
+					"        pm.environment.get(email), ",
+					"        pm.environment.get(\"senha\"),",
+					"        perfil);",
 					"}",
 					"",
 					"// Função para gerar token",
-					"function _sendRequestToken(pm, username, password) {",
-					"    // var url = pm.environment.get(\"base_url\") + \"/fiap-hmv/v1/login\";",
-					"    var url = pm.environment.get(\"base_url\") + \"/api/sanctum/token\";",
+					"function _sendRequestToken(pm, username, password, perfil) {",
+					"    var url = pm.environment.get(\"base_url\") + \"/fiap-hmv/v1/login\";",
 					"    ",
 					"    const body = {",
 					"        mode: 'raw',",
@@ -1599,19 +1829,15 @@
 					"        body: body",
 					"    }, function (err, response) {",
 					"        if (response.code == 200) {",
-					"            var token = response;",
-					"            console.log(response);",
+					"            var token = response.text();",
 					"            console.log(\"token \" + token)",
-					"            pm.collectionVariables.set(\"token\", token);",
+					"            pm.collectionVariables.set(\"token_\" + perfil, token);",
 					"        } else {",
-					"            console.error(res, \"A requisição para gerar token FALHOU\");",
-					"            pm.expect.fail(`Geração de token falhou. Status code: ${res.code}`);",
+					"            console.error(response, \"A requisição para gerar token FALHOU\");",
+					"            // pm.expect.fail(`Geração de token falhou. Status code: ${response.code}`);",
 					"        }",
 					"    });",
 					"}",
-					"pm.sendRequest(\"https://postman-echo.com/get\", function (err, response) {",
-					"    console.log(response.json());",
-					"});",
 					""
 				]
 			}
@@ -1636,9 +1862,9 @@
 					"",
 					"Object.prototype.validarBodyPreenchido = function (pm) {",
 					"",
-					"        pm.test(\"Validação do body preenchido\", function () {",
-					"            pm.response.to.not.have.body(\"\");",
-					"        });",
+					"    pm.test(\"Validação do body preenchido\", function () {",
+					"        pm.response.to.not.have.body(\"\");",
+					"    });",
 					"}",
 					"",
 					"// O campo local deve conter todo o caminho até chegar no valor do JSON",
@@ -1649,7 +1875,7 @@
 					"",
 					"        var jsonData = JSON.parse(JSON.stringify(pm.response.json()));",
 					"        var valueFromResponse = extractValueFromField(jsonData, local);",
-					"",
+					"        console.log('expect ' + expectedValue)",
 					"        if (expectedValue == \"\" || expectedValue == null || expectedValue == undefined || expectedValue == []) {",
 					"            pm.expect(valueFromResponse).to.eql(expectedValue);",
 					"        } else {",
@@ -1675,6 +1901,23 @@
 					"    return path.split('.').reduce(function (prev, curr) {",
 					"        return prev ? prev[curr] : null",
 					"    }, obj || self)",
+					"}",
+					"",
+					"Object.prototype.validateDefaultResponseBody = function (pm, message, status, data) {",
+					"",
+					"    var jsonData = JSON.parse(JSON.stringify(pm.response.json()));",
+					"",
+					"    pm.test(\"Validação da resposta de erro\", function () {",
+					"        pm.expect(message, \"Validação do campo mensagem\").to.eql(jsonData.mensagem);",
+					"        pm.expect(status, \"Validação do campo status\").to.eql(jsonData.status);",
+					"        pm.expect(data, \"Validação do campo detalhes\").to.eql(jsonData.detalhes);",
+					"    });",
+					"}",
+					"",
+					"Object.prototype.validateBody = function (pm, expectedValue) {",
+					"    pm.test(\"Validação do body\", function () {",
+					"        pm.response.to.have.body(expectedValue);",
+					"    });",
 					"}"
 				]
 			}
@@ -1691,6 +1934,36 @@
 		},
 		{
 			"key": "status_code_esperado",
+			"value": ""
+		},
+		{
+			"key": "token_lidiane.sales@example.org",
+			"value": ""
+		},
+		{
+			"key": "token_paciente",
+			"value": ""
+		},
+		{
+			"key": "token_atendente",
+			"value": ""
+		},
+		{
+			"key": "paciente_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_admin",
+			"value": ""
+		},
+		{
+			"key": "admin_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_medico",
 			"value": ""
 		}
 	]
