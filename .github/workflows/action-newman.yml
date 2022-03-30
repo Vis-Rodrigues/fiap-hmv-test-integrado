@@ -7,7 +7,7 @@ on:
   push:
     branches:
     - master
-    - test
+    - test-api
 
 jobs:
 
